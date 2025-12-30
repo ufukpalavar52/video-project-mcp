@@ -10,7 +10,7 @@ services:
       video-object-storage:
         condition: service_started
     ports:
-      - ${MCP_PORT}:${MCP_PORT}
+      - ${VIDEO_HANDLER_PORT:-3333}:${VIDEO_HANDLER_PORT:-3333}
     networks:
       - backend
     env_file:
