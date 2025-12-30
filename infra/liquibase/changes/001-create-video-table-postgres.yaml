@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-video-table-postgres
+      author: ufuk
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: videos
+
+      changes:
+        - createTable:
+            tableName: videos
+            remarks: Video processing table
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: transaction_id
+                  type: VARCHAR(128)
+
+              - column:
+                  name: path
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: output_path
+                  type: VARCHAR(255)
+
+              - column:
+                  name: resolution
+                  type: VARCHAR(20)
+
+              - column:
+                  name: process_type
+                  type: VARCHAR(20)
+
+              - column:
+                  name: is_url
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+
+              - column:
+                  name: start_time
+                  type: INT
+
+              - column:
+                  name: end_time
+                  type: INT
+
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP

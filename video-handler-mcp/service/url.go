@@ -1,0 +1,50 @@
+package service
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+	"video-handler-mcp/util"
+)
+
+type UrlService struct {
+	storage Storage
+}
+
+func NewUrlService(storage Storage) *UrlService {
+	return &UrlService{storage}
+}
+
+func (u *UrlService) GetFile(fullUrl string) ([]byte, error) {
+	return u.DownloadVideo(fullUrl)
+}
+
+func (u *UrlService) PutFile(fullPath string, data []byte) error {
+	return u.storage.PutFile(fullPath, data)
+}
+
+func (u *UrlService) DownloadVideo(fullUrl string) ([]byte, error) {
+	filename := fmt.Sprintf("%s.mp4", util.UUID())
+	args := []string{
+		"--js-runtimes", "deno",
+		"-f",
+		"best[height<=480]",
+		"-o",
+		filename,
+		fullUrl,
+	}
+
+	log.Printf("Downloading video[url:%s]...\n", fullUrl)
+	cmd := exec.Command("yt-dlp", args...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Println("Command: yt-dlp " + strings.Join(args, " "))
+		return nil, util.NewError("Download Error: %v, Output: %s", err, out)
+	}
+
+	defer util.DeleteFile(filename)
+	log.Printf("Downloaded video[url:%s]\n", fullUrl)
+	return os.ReadFile(filename)
+}

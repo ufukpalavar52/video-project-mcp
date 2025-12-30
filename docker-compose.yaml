@@ -1,0 +1,77 @@
+services:
+  video-handler-mcp:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./video-handler-mcp/Dockerfile
+    depends_on:
+      kafka:
+        condition: service_healthy
+      video-object-storage:
+        condition: service_started
+    ports:
+      - ${MCP_PORT}:${MCP_PORT}
+    networks:
+      - backend
+    env_file:
+      - .env
+    volumes:
+      - handler-data:${TEMP_VIDEO_PATH:-/tmp-video-file}
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 3G
+  video-processor:
+    build:
+      context: .
+      dockerfile: ./video-processor/Dockerfile
+      args:
+        - VIDEO_PROCESSOR_PORT=${VIDEO_PROCESSOR_PORT:-8000}
+    ports:
+      - "${VIDEO_PROCESSOR_PORT:-8000}:${VIDEO_PROCESSOR_PORT:-8000}"
+    restart: always
+    environment:
+      - KAFKAJS_NO_PARTITIONER_WARNING=1
+    env_file:
+      - .env
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      kafka:
+        condition: service_healthy
+      video-object-storage:
+        condition: service_started
+      video-db:
+        condition: service_started
+      liquibase:
+        condition: service_completed_successfully
+      video-handler-mcp:
+        condition: service_started
+  video-ui:
+    depends_on:
+      - video-processor
+    build:
+      context: .
+      dockerfile: ./video-ui/Dockerfile
+    ports:
+      - "${VIDEO_UI_PORT:-3000}:3000"
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - frontend
+include:
+  - infra/postgres.yaml
+  - infra/s3.yaml
+  - infra/kafka.yaml
+  - infra/liquibase.yaml
+  - infra/ollama.yaml
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+volumes:
+  handler-data:

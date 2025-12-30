@@ -1,0 +1,22 @@
+services:
+  ollama:
+    image: alpine/ollama
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./ollama-doc/start.sh:/start.sh
+    env_file:
+      - ../.env
+    ports:
+      - "11434:11434"
+    networks:
+      - backend
+      - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 6G
+    entrypoint: ["/bin/sh", "/start.sh"]
+
+volumes:
+  ollama_data:

@@ -1,0 +1,21 @@
+services:
+  liquibase:
+    build: ./liquibase
+    depends_on:
+      - video-db
+    env_file:
+      - ../.env
+    volumes:
+      - ./liquibase:/liquibase/changelog
+    networks:
+      - backend
+    environment:
+      - LIQUIBASE_COMMAND_CHANGELOG_FILE=/liquibase/changelog/changelog.yaml
+      - LIQUIBASE_SEARCH_PATH=/liquibase/changelog
+    command:
+      - --url=jdbc:postgresql://video-db:5432/${DB_DATABASE}
+      - --driver=org.postgresql.Driver
+      - --username=${DB_USER}
+      - --password=${DB_PASSWORD}
+      - --changeLogFile=changelog.yaml
+      - update

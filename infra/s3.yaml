@@ -1,0 +1,19 @@
+services:
+  video-object-storage:
+    image: quay.io/minio/minio
+    ports:
+      - "${S3_PORT:-9000}:9000"
+      - "${S3_WEB_PORT:-9001}:9001"
+    networks:
+      - backend
+    env_file:
+      - ../.env
+    environment:
+      - MINIO_ROOT_USER=${S3_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${S3_SECRET_KEY}
+    volumes:
+      - object_storage:/data
+    command: server /data --console-address ":9001"
+
+volumes:
+  object_storage:

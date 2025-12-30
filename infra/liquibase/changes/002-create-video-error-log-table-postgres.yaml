@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-video-error-log-table-postgres
+      author: ufuk
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: video_error_logs
+
+      changes:
+        - createTable:
+            tableName: video_error_logs
+            remarks: Video processing error logs
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: transaction_id
+                  type: VARCHAR(128)
+
+              - column:
+                  name: message
+                  type: TEXT
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
