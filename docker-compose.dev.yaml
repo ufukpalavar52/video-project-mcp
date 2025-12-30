@@ -18,6 +18,7 @@ services:
     volumes:
       - handler-data:${TEMP_VIDEO_PATH:-/tmp-video-file}
       - ./video-handler-mcp:/app
+      - go-pkg-cache:/root/go/pkg/mod
     deploy:
       resources:
         limits:
@@ -82,3 +83,4 @@ networks:
     driver: bridge
 volumes:
   handler-data:
+  go-pkg-cache:

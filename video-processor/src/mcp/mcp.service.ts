@@ -5,13 +5,17 @@ import { randomUUID } from 'node:crypto';
 import { ApiConfig } from '../common/config/config';
 import { McpResponseDTO } from './dto';
 import { VideoStatus } from '../common/constants/video';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class MCPService {
   private readonly logger = new Logger(MCPService.name);
   private mcpUrl = ApiConfig.MCP_URL;
 
-  constructor(private readonly llmService: LlmService) {}
+  constructor(
+    private readonly llmService: LlmService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async handleProcess(video: Video) {
     const ask = await this.llmService.askByVideo(video);
@@ -41,13 +45,15 @@ export class MCPService {
 
   async callMcpTool(tool: string, args: any) {
     const sessionId = randomUUID();
+    const jwtToken = this.jwtService.sign({ sessionId: sessionId });
+    const mcpHeaderPrefix = 'mcp-session-';
     const url = `${this.mcpUrl}`;
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer internal-token',
-        'Mcp-Session-Id': `mcp-session-${sessionId}`,
+        Authorization: `Bearer ${jwtToken}`,
+        'Mcp-Session-Id': `${mcpHeaderPrefix}${sessionId}`,
       },
       body: JSON.stringify({
         jsonrpc: '2.0',

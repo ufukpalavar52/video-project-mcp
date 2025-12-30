@@ -8,6 +8,7 @@ import (
 )
 
 type AppConfig struct {
+	AppSecretKey     string
 	Port             string
 	KafkaBrokers     []string
 	KafkaGroupId     string
@@ -42,6 +43,7 @@ func initApiConfig() {
 	queueConcurrency := GetEnvInt("QUEUE_CONCURRENCY", 5)
 
 	ApiConfig = AppConfig{
+		AppSecretKey:     GetEnv("APP_SECRET_KEY"),
 		Port:             GetEnv("VIDEO_HANDLER_PORT", "3333"),
 		KafkaBrokers:     strings.Split(kafkaBroker, ","),
 		KafkaGroupId:     GetEnv("KAFKA_GROUP_ID", "video-handler-kafka-group"),
