@@ -27,7 +27,7 @@ export const ApiConfig = {
 
   MCP_URL: process.env.MCP_URL,
   MCP_JWT_KEY: process.env.MCP_JWT_KEY || 'mcp-jwt-key',
-  APP_SECRET_KEY: process.env.APP_SECRET_KEY,
+  APP_SECRET_KEY: process.env.APP_SECRET_KEY || '',
 
   MAX_FILE_SIZE: process.env.MAX_FILE_SIZE || '100mb',
 
