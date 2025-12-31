@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 	"video-handler-mcp/util"
 
 	"github.com/segmentio/kafka-go"
@@ -12,6 +13,7 @@ import (
 
 const NumPartitions = 4
 const ReplicationFactor = 1
+const MaxConsumeRetry = 3
 
 type KafkaService struct {
 	Servers []string
@@ -33,9 +35,12 @@ func (k *KafkaService) Produce(topic string, message []byte) error {
 	}
 
 	w := &kafka.Writer{
-		Addr:     kafka.TCP(k.Servers...),
-		Topic:    topic,
-		Balancer: &kafka.LeastBytes{},
+		Addr:         kafka.TCP(k.Servers...),
+		Topic:        topic,
+		Balancer:     &kafka.LeastBytes{},
+		MaxAttempts:  10,
+		WriteTimeout: 10 * time.Second,
+		RequiredAcks: kafka.RequireAll,
 	}
 	defer func() {
 		_ = w.Close()
@@ -63,7 +68,7 @@ func (k *KafkaService) ProduceAny(topic string, message any) error {
 	return k.Produce(topic, data)
 }
 
-func (k *KafkaService) Consume(topic string, callback func(message []byte)) {
+func (k *KafkaService) Consume(topic string, callback func(message []byte), count ...int) {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:     k.Servers,
 		Topic:       topic,
@@ -77,9 +82,22 @@ func (k *KafkaService) Consume(topic string, callback func(message []byte)) {
 	}()
 	ctx := context.Background()
 
+	c := 0
+	if len(count) > 0 {
+		c = count[0]
+	}
+
+	log.Printf("Kafka %s topic listening...\n", topic)
 	for {
 		m, err := r.ReadMessage(ctx)
 		if err != nil {
+			if c < MaxConsumeRetry {
+				c++
+				log.Printf("Error consume %s topic. Retrying[%d]...\n ", topic, c)
+				time.Sleep(2 * time.Second)
+				k.Consume(topic, callback, c)
+				return
+			}
 			log.Fatalf("Error reading message: %v", err)
 		}
 		callback(m.Value)

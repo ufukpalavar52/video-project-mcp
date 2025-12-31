@@ -2,7 +2,8 @@ services:
   liquibase:
     build: ./liquibase
     depends_on:
-      - video-db
+      video-db:
+        condition: service_healthy
     env_file:
       - ../.env
     volumes:

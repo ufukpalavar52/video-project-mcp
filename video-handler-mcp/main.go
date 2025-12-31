@@ -116,7 +116,6 @@ func ParseVideoParams(args any) (*model.VideoRequest, error) {
 
 func KafkaListen(consumeTopic string, callback func([]byte)) {
 	limit := make(chan int, util.ApiConfig.QueueConcurrency)
-	log.Printf("Kafka %s topic listening...\n", consumeTopic)
 	kafkaService.Consume(consumeTopic, func(message []byte) {
 		limit <- 1
 		go func() {
