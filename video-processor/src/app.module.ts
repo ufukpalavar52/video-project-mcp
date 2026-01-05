@@ -7,14 +7,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppDataSource } from './data-source';
 import { KafkaModule } from './common/kafka/kafka.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
-import { JwtModule } from '@nestjs/jwt';
-import { ApiConfig } from './common/config/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     KafkaModule,
     VideoModule,
     TypeOrmModule.forRoot(AppDataSource.options),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

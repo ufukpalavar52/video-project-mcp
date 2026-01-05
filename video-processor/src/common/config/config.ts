@@ -37,4 +37,6 @@ export const ApiConfig = {
   KAFKA_GROUP_ID:
     process.env.PROCESSOR_KAFKA_GROUP_ID || 'video-processor-group',
   STATUS_TOPIC: process.env.GIF_TOPIC || 'status-tasks',
+
+  MAX_PROCESS_RETRY: Number(process.env.MAX_PROCESS_RETRY || 3),
 };

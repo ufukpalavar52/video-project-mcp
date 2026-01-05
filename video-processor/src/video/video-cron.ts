@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { LessThan, Repository } from 'typeorm';
-import { Video } from '../video/video.model';
+import { Video } from './video.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { VideoStatus } from '../common/constants/video';
@@ -9,16 +9,17 @@ import { KafkaMcpAsk } from '../common/constants/kafka';
 import { ApiConfig } from '../common/config/config';
 
 @Injectable()
-export class VideoService {
-  private readonly logger = new Logger(VideoService.name);
+export class VideoCronService {
+  private readonly logger = new Logger(VideoCronService.name);
   constructor(
     @InjectRepository(Video)
     private videoRepository: Repository<Video>,
     @Inject('KAFKA_SERVICE') private kafka: ClientKafka,
   ) {}
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async checkPending() {
+    this.logger.log(`Checking pending videos.`);
     const now = new Date();
     const lastHour = new Date(now);
     lastHour.setHours(lastHour.getHours() - 1);
@@ -31,8 +32,9 @@ export class VideoService {
     await this.addProcessQueues(videos);
   }
 
-  @Cron(CronExpression.EVERY_2_HOURS)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async checkInProgress() {
+    this.logger.log(`Checking in progress videos.`);
     const now = new Date();
     const last2Hour = new Date(now);
     last2Hour.setHours(last2Hour.getHours() - 2);

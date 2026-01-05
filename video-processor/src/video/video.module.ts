@@ -7,6 +7,7 @@ import { Video } from './video.model';
 import { VideoErrorLog } from './video-error-log.model';
 import { MCPModule } from '../mcp/mcp.module';
 import { VideoConsumer } from './video-consumer';
+import { VideoCronService } from './video-cron';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { VideoConsumer } from './video-consumer';
     TypeOrmModule.forFeature([Video, VideoErrorLog]),
   ],
   controllers: [VideoController, VideoConsumer],
-  providers: [VideoService],
+  providers: [VideoService, VideoCronService],
 })
 export class VideoModule {}

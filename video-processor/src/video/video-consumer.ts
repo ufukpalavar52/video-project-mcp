@@ -6,6 +6,7 @@ import { MCPService } from '../mcp/mcp.service';
 import { ApiConfig } from '../common/config/config';
 import { McpResponseDTO } from '../mcp/dto';
 import { VideoStatus } from '../common/constants/video';
+import { KafkaMcpAsk } from '../common/constants/kafka';
 
 @Controller()
 export class VideoConsumer {
@@ -16,7 +17,7 @@ export class VideoConsumer {
     @Inject('KAFKA_SERVICE') private kafka: ClientKafka,
   ) {}
 
-  @EventPattern('mcp-ask')
+  @EventPattern(KafkaMcpAsk)
   async mcpAsk(@Payload() data: Video) {
     const now = Date.now();
     this.logger.log(`Processing mcp-ask. Data:${JSON.stringify(data)}`);

@@ -87,6 +87,7 @@ func ProcessMcp(topic string, ctx context.Context, args any) (*mcp.CallToolResul
 	log.Println("Video status", videoStatus)
 	err = kafkaService.ProduceAny(util.ApiConfig.StatusTopic, videoStatus)
 	if err != nil {
+
 		return McpResponse("nok", err)
 	}
 
@@ -145,6 +146,13 @@ func CutProcess(data []byte) {
 }
 
 func CommonProcess(videoReq *model.VideoRequest, processType string) {
+	defer deleteTransaction(videoReq.TransactionID)
+	_, ok := transactions.Load(videoReq.TransactionID)
+	if ok {
+		log.Println("Duplicate transaction. Transaction ID:", videoReq.TransactionID)
+	}
+	transactions.Store(videoReq.TransactionID, time.Now())
+
 	s := service.BuildVideoProcess(videoReq, processType)
 	videoMcp := model.VideoMcp{TransactionID: videoReq.TransactionID, Status: util.Success}
 	err := s.Process()
@@ -187,4 +195,9 @@ func prepareInputSchema() mcp.ToolInputSchema {
 		},
 		Required: []string{"videoPath", "transactionId", "isUrl", "start", "end"},
 	}
+}
+
+func deleteTransaction(transactionId string) {
+	transactions.Delete(transactionId)
+	log.Println("Deleted transaction. Transaction ID:", transactionId)
 }

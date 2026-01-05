@@ -21,6 +21,7 @@ import express from 'express';
 import { Readable } from 'node:stream';
 import { VideoProcessType } from '../common/constants/video';
 import { randomUUID } from 'node:crypto';
+import { KafkaMcpAsk } from '../common/constants/kafka';
 
 @Controller('api/video')
 export class VideoController {
@@ -53,7 +54,7 @@ export class VideoController {
       throw new BadRequestException(['Url or file is required']);
     }
     const video = await this.videoService.save(body, file);
-    this.kafka.emit('mcp-ask', video);
+    this.kafka.emit(KafkaMcpAsk, video);
     return video;
   }
 
