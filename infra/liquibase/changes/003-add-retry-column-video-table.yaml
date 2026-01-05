@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-add-retry-column-video-table
+      author: ufukpalavar52
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          columnExists:
+            tableName: videos
+            columnName: retry_count
+      changes:
+        - addColumn:
+            tableName: videos
+            columns:
+              - column:
+                  name: retry_count
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true

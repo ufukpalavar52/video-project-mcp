@@ -3,3 +3,5 @@ databaseChangeLog:
       file: changes/001-create-video-table-postgres.yaml
   - include:
       file: changes/002-create-video-error-log-table-postgres.yaml
+  - include:
+      file: changes/003-add-retry-column-video-table.yaml

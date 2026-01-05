@@ -41,6 +41,9 @@ export class Video {
   @Column('varchar', { length: 20 })
   status: string;
 
+  @Column({ type: 'int' })
+  retryCount: number;
+
   @CreateDateColumn({
     type: 'timestamp',
   })
