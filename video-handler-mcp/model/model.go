@@ -1,5 +1,7 @@
 package model
 
+import "video-handler-mcp/util"
+
 type VideoMcp struct {
 	TransactionID string `json:"transactionId"`
 	Message       any    `json:"message"`
@@ -8,13 +10,13 @@ type VideoMcp struct {
 }
 
 type VideoRequest struct {
-	TransactionID string `json:"transactionId"`
-	IsUrl         bool   `json:"isUrl"`
-	VideoPath     string `json:"videoPath"`
-	Start         any    `json:"start"`
-	End           any    `json:"end"`
+	TransactionID string        `json:"transactionId"`
+	IsUrl         util.FlexBool `json:"isUrl"`
+	VideoPath     string        `json:"videoPath"`
+	Start         any           `json:"start"`
+	End           any           `json:"end"`
 }
 
-func (vr *VideoRequest) GetPathOrUrl() string {
-	return vr.VideoPath
+func (vr *VideoRequest) CheckIsUrl() bool {
+	return bool(vr.IsUrl)
 }

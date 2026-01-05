@@ -15,19 +15,19 @@ type GifService struct {
 func NewGifService(video *model.VideoRequest) *GifService {
 	gifService := &GifService{
 		video:   video,
-		storage: NewStorage(video.IsUrl),
+		storage: NewStorage(video.CheckIsUrl()),
 	}
 	return gifService
 }
 
 func (g *GifService) Process() error {
-	video, err := g.storage.GetFile(g.video.GetPathOrUrl())
+	video, err := g.storage.GetFile(g.video.VideoPath)
 	if err != nil {
 		return err
 	}
 	filename := util.UUID() + ".mp4"
-	if !g.video.IsUrl {
-		_, filename, _ = util.ParsePath(g.video.GetPathOrUrl())
+	if !g.video.CheckIsUrl() {
+		_, filename, _ = util.ParsePath(g.video.VideoPath)
 	}
 
 	filePath, err := SaveFile(video, filename)

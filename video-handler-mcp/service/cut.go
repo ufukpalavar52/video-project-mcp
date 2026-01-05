@@ -17,18 +17,18 @@ type CutVideoService struct {
 func NewCutVideoService(video *model.VideoRequest) *CutVideoService {
 	cropService := &CutVideoService{
 		video:   video,
-		storage: NewStorage(video.IsUrl),
+		storage: NewStorage(video.CheckIsUrl()),
 	}
 	return cropService
 }
 
 func (c *CutVideoService) Process() error {
-	video, err := c.storage.GetFile(c.video.GetPathOrUrl())
+	video, err := c.storage.GetFile(c.video.VideoPath)
 	if err != nil {
 		return err
 	}
 	filename := util.UUID() + ".mp4"
-	if !c.video.IsUrl {
+	if !c.video.CheckIsUrl() {
 		_, filename, _ = util.ParsePath(c.video.VideoPath)
 	}
 
