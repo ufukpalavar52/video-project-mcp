@@ -4,7 +4,10 @@ import { ApiConfig } from '../common/config/config';
 import { ClientOptions } from 'openai/client';
 import { askCutPrompt, askGifPrompt, SystemPrompts } from './llm.properties';
 import { Video } from '../video/video.model';
-import { getVideoProcessType } from '../common/constants/video';
+import {
+  getVideoProcessType,
+  VideoProcessType,
+} from '../common/constants/video';
 
 @Injectable()
 export class LlmService {
@@ -100,7 +103,7 @@ export class LlmService {
 
   async askByVideo(video: Video) {
     const message =
-      getVideoProcessType(video.processType) == 'GIF'
+      getVideoProcessType(video.processType) == VideoProcessType.GIF
         ? askGifPrompt
         : askCutPrompt;
 
